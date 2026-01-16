@@ -1,5 +1,5 @@
 async function getItem(id) {
-  const res = await fetch(`http://localhost:5000/items/${id}`, {
+  const res = await fetch(`/api/items/${id}`, {
     cache: "no-store",
   });
 
