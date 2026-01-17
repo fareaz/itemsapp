@@ -1,17 +1,16 @@
 async function getItem(id) {
-  const res = await fetch(`/api/items/${id}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/items?id=${id}`,
+    { cache: "no-store" }
+  );
 
-  if (!res.ok) {
-    return null;
-  }
+  if (!res.ok) return null;
 
   return res.json();
 }
 
 export default async function ItemDetailsPage({ params }) {
-  // Next.js 16 rule
+  // ✅ Next.js 16 FIX
   const { id } = await params;
 
   const item = await getItem(id);
@@ -27,14 +26,22 @@ export default async function ItemDetailsPage({ params }) {
   return (
     <div className="max-w-4xl mx-auto px-6 py-20">
       <img
-        src={item.image}
+        src={item.image || "https://via.placeholder.com/600"}
         alt={item.name}
         className="w-full h-96 object-cover mb-8 rounded"
       />
 
-      <h1 className="text-4xl font-bold mb-4">{item.name}</h1>
-      <p className="text-gray-600 mb-4">{item.description}</p>
-      <p className="text-2xl font-semibold">${item.price}</p>
+      <h1 className="text-4xl font-bold mb-4">
+        {item.name}
+      </h1>
+
+      <p className="text-gray-600 mb-4">
+        {item.description}
+      </p>
+
+      <p className="text-2xl font-semibold">
+        ${item.price}
+      </p>
     </div>
   );
 }

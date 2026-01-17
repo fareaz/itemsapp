@@ -1,35 +1,70 @@
+import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 
-let items = [
-  {
-    id: "1",
-    name: "Laptop",
-    description: "High performance laptop",
-    price: 1200,
-    image: "https://via.placeholder.com/300",
-  },
-  {
-    id: "2",
-    name: "Phone",
-    description: "Latest smartphone",
-    price: 800,
-    image: "https://via.placeholder.com/300",
-  },
-];
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
 
-export async function GET() {
-  return NextResponse.json(items);
+    const client = await clientPromise;
+    const db = client.db("itemsDB");
+
+    if (id) {
+      const item = await db
+        .collection("items")
+        .findOne({ _id: new ObjectId(id) });
+
+      return NextResponse.json(item);
+    }
+
+    const items = await db
+      .collection("items")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return NextResponse.json(items);
+  } catch (err) {
+    return NextResponse.json(
+      { error: err.message },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  const newItem = {
-    id: Date.now().toString(),
-    ...body,
-  };
+    const { name, description, price, image } = body;
 
-  items.push(newItem);
+    if (!name || !price) {
+      return NextResponse.json(
+        { error: "Name and price required" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json(newItem, { status: 201 });
+    const client = await clientPromise;
+    const db = client.db("itemsDB");
+
+    const result = await db.collection("items").insertOne({
+      name,
+      description,
+      price: Number(price),
+      image,
+      createdAt: new Date(),
+    });
+
+    return NextResponse.json({
+      success: true,
+      id: result.insertedId,
+    });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err.message },
+      { status: 500 }
+    );
+  }
 }
