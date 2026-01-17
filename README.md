@@ -2,6 +2,7 @@
 
 ItemsApp is a simple full-stack web application built using Next.js (App Router) and Express.js.  
 It demonstrates public and protected routes, mock authentication, and basic CRUD functionality.
+Live Link - https://itemsapp.vercel.app/
 
 ---
 
@@ -23,6 +24,7 @@ It demonstrates public and protected routes, mock authentication, and basic CRUD
 - Next.js 16 (App Router)
 - React
 - Express.js
+- MongoDB
 - Tailwind CSS
 - react-hot-toast
 
